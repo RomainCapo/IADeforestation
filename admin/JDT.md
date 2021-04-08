@@ -170,18 +170,52 @@
 * **Entrainement en transfer learning culture vs no culture - 0h30**
     * Entrainement avec les modèles d'E.Ransom avec le transfer learning
 
-## Semaine 6 - 29.03.2021 - 02.04.2021 [12h00]
+## Semaine 6 - 29.03.2021 - 02.04.2021 [14h00]
 * **Découpage des images en 32x32 - 0h30**
 * **Entrainement des modèles avec les images 32x32 - 2h00**
     * Entrainement modèles Coffee vs no coffee
     * Entrainement modèles culture vs no culture
-* **Comparaison résultats modèles 32x32 vs 64vs64 - 0h30**
+* **Lecture de l'article sur Fastaii et tentative de mettre en place l'environnement - 3h00**
+    * Lecture de l'article https://link.medium.com/ncZaHz2YLeb sur la classification d'image Satellite avec FastAI
+        * Ce qui ressort de l'article est que de bons resultat sont obtenus en utilisant pas toute les 13 bands mais en effectuant des variations de bandes.
+    * Tentative de mise en place du même environement que dans l'article avec FastAI, cepandant de nombreux problème ont été rencontrés :
+        1. La version du tutoriel n'est plus la meme que la version actuelle et la librairie a beaucoup changer entre temps
+        2. Le librairie a très peu de documentation, ce qui ne facilite pas sa mise en place
+    * Après plusieurs tentatives cette solution a été mise en pause pour ne pas perdre trop de temps.
+* **Affichage de graphique de type GradCAM et FilterMaximisation - 3h00**
+    * Dans le but de visualiser quelle partie de l'image sont utilisées pour determiner la classe lors de la classification, des graphiques de type GradCam et FilterMaximisation ont été mis en place.
+    * On constate que pour les images de caffé, les fleurs blanches ont l'air d'être prise en compte pour la classification, pour la foret vierge on constate que les arbres denses sont pris en compte pour la classification.
+* **Entrainement des modèles de transfer leanrning (E.Ransome) en modifiant le nombre de bande - 1h00**
+    * Entrainement du modèle en conservant uniquement les bandes de haute résolution (1,2,3,4,5,6,7,8,11,12)
+    * Modification de l'input du modèle pour accepter un nombre de bande < 13
+    * Le modèle n'obtient pas du tout de bon résultat car l'ordre des bandes n'est pas conservé dans cette version
+    * Cette méthodologie est donc a abandonné.
+* **Entrainement des modèles de transfer learning (E.Ransome) en modifiant la taille des images d'entrée (32x32) - 1h30**
+    * Modification de l'input du modèle pour accepter les images de taille (32x32)
+    * Des résultats satisfaisant sont obtenus mais quand même moins bon qu'avec des images de 64x64
+    * L'entrainement a été réalisé pour Coffee vs Other, Culture vs No Culture
+* **Comparaison résultats modèles 32x32 vs 64vs64 - 1h00**
+    * Pour les modèles avec Tensorflow hub et le transfer learning (E.Ransome)
     * Création de grahpique pour comparer la loss et l'accuracy
     * A première vue sur les deux types de modèles (coffee et culture) les images 64x64 semblent donner de meilleur résultats
+* **Entrainement de modèles de transfer learning (E.Ransome) en ajoutant une couche de pooling - 0h30**
+    * Ajout d'une couche de pooling immédiatement après la sortie du modèle de transfer learning.
+    * Des mauvais moins bon résultats ont été obtenu qu'avec la couche Flatten() utilisé par tout les autres modèles jusqu'à présent.
+    * Cette soltuion a donc été mise en suspens pour le moment.
+* **Ajout d'une couche de pooling pour modifier le nombre de bandes en entrée et entrainement des modèles coorespondant- 4h00**
+    * Ajout d'une couche de pooling "trainable" pour modifier conserver uniquement le nombre de channel désiré.
+    * Plusieurs configurations ont été mise en place :
+        * Input 10 bandes -> Conv2D(3,(1,1)) -> Modèle transfer learning RGB (3 bandes)
+    * Entrainement des modèles correspondants
 
 # Idées
 * Autoencoder
 * Reduction de dimension 13 -> 3
+
+# Taches
+* Cross val
+* Entrainement image une seule saison
+* Preprcess avec mean et std jeu de données
 
 # Informations
 * Vietnam saison :

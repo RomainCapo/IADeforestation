@@ -7,16 +7,16 @@ from datetime import date
 import os
 import zipfile
 
-OUTPUT_FOLDER = 'SentinelImagesss'
+OUTPUT_FOLDER = 'D:\Fall'
 
 api = SentinelAPI('alpha_03', 'R9846om157', 'https://scihub.copernicus.eu/dhus')
 
 footprint = geojson_to_wkt(read_geojson('map.geojson'))
 products = api.query(footprint,
                      platformname='Sentinel-2',
-                     date=("NOW-10DAY", 'NOW-5DAY'),
+                     date=("20210101", 'NOW'),
                      producttype='S2MSI1C',
-                     cloudcoverpercentage=(0, 30))
+                     cloudcoverpercentage=(0, 1))
 
 print(len(products))
 
