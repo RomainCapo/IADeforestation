@@ -192,7 +192,7 @@ def export_img(img, name, labels, dtype, crs, transform, export_folder='images')
     elif len(labels) > 1:
         target_label = -1
     
-    if target_label >= -1 and target_label <= 32: 
+    if target_label >= 1 and target_label <= 32: 
         with rasterio.open(os.path.join(export_folder, str(target_label), name+'.tiff'), 'w', driver='Gtiff',
                                                   width=img.shape[1],
                                                   height=img.shape[2],

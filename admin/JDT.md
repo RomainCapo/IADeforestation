@@ -170,7 +170,7 @@
 * **Entrainement en transfer learning culture vs no culture - 0h30**
     * Entrainement avec les modèles d'E.Ransom avec le transfer learning
 
-## Semaine 6 - 29.03.2021 - 02.04.2021 [14h00]
+## Semaine 6 - 29.03.2021 - 02.04.2021 [15h00]
 * **Découpage des images en 32x32 - 0h30**
 * **Entrainement des modèles avec les images 32x32 - 2h00**
     * Entrainement modèles Coffee vs no coffee
@@ -202,19 +202,49 @@
     * Ajout d'une couche de pooling immédiatement après la sortie du modèle de transfer learning.
     * Des mauvais moins bon résultats ont été obtenu qu'avec la couche Flatten() utilisé par tout les autres modèles jusqu'à présent.
     * Cette soltuion a donc été mise en suspens pour le moment.
-* **Ajout d'une couche de pooling pour modifier le nombre de bandes en entrée et entrainement des modèles coorespondant- 4h00**
+* **Ajout d'une couche de pooling pour modifier le nombre de bandes en entrée et entrainement des modèles coorespondant [RGB]- 4h30**
     * Ajout d'une couche de pooling "trainable" pour modifier conserver uniquement le nombre de channel désiré.
     * Plusieurs configurations ont été mise en place :
-        * Input 10 bandes -> Conv2D(3,(1,1)) -> Modèle transfer learning RGB (3 bandes)
-    * Entrainement des modèles correspondants
+        * Input 10 bandes haute résolution (1,2,3,4,5,6,7,8,11,12) 
+            * Conv2D(3,(1,1)) -> Modèle transfer learning RGB (3 bandes)
+        * Input 13 bandes  
+            * Conv2D(3,(1,1)) Modèle transfer learning RGB (3 bandes)
+        * Input 6 bandes RGB + SWIR 
+            * Conv2D(3,(1,1)) -> Modèle transfer learning RGB (3 bandes)
+    * Entrainement des modèles correspondant en utilisant le modèle RGB préentrainé de E.Ransome.
+    * Conclusion : Les résultats obtenu sont inférieurs à la méthode traditionnel 13 bandes de transfer learning. Pour l'expérience utilisé on constate que moins le modèle utilise de band plus les résultats obtenu sont meilleurs (mais toujours moins bon que l'expérience traditionnelle). 
+
+## 05.04.2021 - 11.04.2021 [12h00]
+* **Ajout d'une couche de pooling pour modifier le nombre de bandes en entrée et entrainement des modèles coorespondant [13bands]- 3h00**
+    * Même expérience que préccedement mais utilisation du modèle pré-entrainé 13 bandes au lieu de RGB.
+    * Plusieurs configurations ont été mise en place :
+        * Input 10 bandes haute résolution (1,2,3,4,5,6,7,8,11,12) 
+            * Conv2D(13,(1,1)) -> Modèle transfer learning RGB (3 bandes)
+        * Input 6 bandes RGB + SWIR 
+            * Conv2D(13,(1,1)) -> Modèle transfer learning RGB (3 bandes)
+    * Note : Encore une fois, cette technique n'a pas amélioré les résultats par rapport à la méthode origniale utilisant les 13 bands
+* **Mise en place de graphes et stats pour comparer le résultats des deux expérience de vraitions du nombre de bandes - 0h30**
+* **Entrainement modèle Transfer learning avec images du printemps - 3h00**
+    * D'après l'etude réalisé par S.Walther[1], deux informations importantes sont mise en avant :
+        1. Les mois de Janvier à Avril sont les mois de l'années au Vietnam ou il y a le moins de couverture nuageuse sur les images satellite. Ceci va donc permettre de limiter la précense d'image inutilisable (car rempli de nuage )dans le jeu de données.
+        2. De Janvier à Avril les arbres à Café sont fortement arrosé, dans le but de fleurir en Février. Durant cette période, les arbres a café sont donc plus facilement visible depuis le ciel à l'aide des flurs blanches qui les composent. 
+    * A partir de ces 2 infos, les images de l'année 2021 ont été récupéré sur cette période, découpé et prétraité. 
+    * Les 2 modèles de transfer learning 13 bands ont été entrainé avec ces nouvelles images. 
+* **Entrainement des modèles de transfer learning en modifiant les paramètres de normalisation - 4h00**
+    * Jusqu'a présent dans le but de reproduir fidélement le preprocessing effectué par E.Ransome, une normalisation de type z-norm avec la moyenne et l'écart type de toute les images d'Eurosat a été utilisé. En appliquant cette normalisation sur nos images on constate que les pixels ne sont pas centrés sur la valeur 0 (ce qui est le but d'une normalisation z-norm). Ceci provient surement du fait que les images Eurosat capturé sur des paysages européen de présente pas les mêmes caractéristiques que les images du sol vietnamien.
+    * L'idée est alors de calculer la moyenne et l'écart type sur les images du Vietnam et d'utiliser ces paramètres pour effectuer la normalisation z-norm sur ces parametres et de réentrainer les modèles.
+    * Etape :
+        1. Calcul de la moyenne et std de toutes les images sur toutes une année (100000 pixels aléatoire par images ont été selectionnés)
+        2. Réalisation d'histogramme pour comparer la répartition des pixels entre les params eurosat et vietnam
+        3. Entrainement des nouveaux modèles
+        4. Comparaison et analyse des résultats
+
 
 # Idées
 * Autoencoder
-* Reduction de dimension 13 -> 3
 
 # Taches
 * Cross val
-* Entrainement image une seule saison
 * Preprcess avec mean et std jeu de données
 
 # Informations
@@ -226,3 +256,6 @@
     * Ete : 21 Juin - 21 Septembre
     * Automne : 22 Septembre - 20 Decemembre
     * Hiver : 21 Decembre - 19 Mars
+
+# Sources
+[1] - bandsVariability, March 15, 2021, S.Walther

@@ -14,13 +14,13 @@ api = SentinelAPI('alpha_03', 'R9846om157', 'https://scihub.copernicus.eu/dhus')
 footprint = geojson_to_wkt(read_geojson('map.geojson'))
 products = api.query(footprint,
                      platformname='Sentinel-2',
-                     date=("20210101", 'NOW'),
+                     date=("20200101", '20200410'),
                      producttype='S2MSI1C',
                      cloudcoverpercentage=(0, 1))
 
 print(len(products))
 
-if not os.path.exists(OUTPUT_FOLDER):
+'''if not os.path.exists(OUTPUT_FOLDER):
     os.makedirs(OUTPUT_FOLDER)
 
 api.download_all(products, OUTPUT_FOLDER)
@@ -30,4 +30,4 @@ for path in os.listdir(OUTPUT_FOLDER):
         with zipfile.ZipFile(path, 'r') as zip_ref:
             zip_ref.extractall(OUTPUT_FOLDER)
         
-        os.remove(path)
+        os.remove(path)'''
