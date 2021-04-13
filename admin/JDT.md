@@ -214,7 +214,7 @@
     * Entrainement des modèles correspondant en utilisant le modèle RGB préentrainé de E.Ransome.
     * Conclusion : Les résultats obtenu sont inférieurs à la méthode traditionnel 13 bandes de transfer learning. Pour l'expérience utilisé on constate que moins le modèle utilise de band plus les résultats obtenu sont meilleurs (mais toujours moins bon que l'expérience traditionnelle). 
 
-## 05.04.2021 - 11.04.2021 [12h00]
+## 05.04.2021 - 11.04.2021 [10h00]
 * **Ajout d'une couche de pooling pour modifier le nombre de bandes en entrée et entrainement des modèles coorespondant [13bands]- 3h00**
     * Même expérience que préccedement mais utilisation du modèle pré-entrainé 13 bandes au lieu de RGB.
     * Plusieurs configurations ont été mise en place :
@@ -223,14 +223,14 @@
         * Input 6 bandes RGB + SWIR 
             * Conv2D(13,(1,1)) -> Modèle transfer learning RGB (3 bandes)
     * Note : Encore une fois, cette technique n'a pas amélioré les résultats par rapport à la méthode origniale utilisant les 13 bands
-* **Mise en place de graphes et stats pour comparer le résultats des deux expérience de vraitions du nombre de bandes - 0h30**
+* **Mise en place de graphes et stats pour comparer le résultats des deux expérience de vraitions du nombre de bandes - 1h00**
 * **Entrainement modèle Transfer learning avec images du printemps - 3h00**
     * D'après l'etude réalisé par S.Walther[1], deux informations importantes sont mise en avant :
         1. Les mois de Janvier à Avril sont les mois de l'années au Vietnam ou il y a le moins de couverture nuageuse sur les images satellite. Ceci va donc permettre de limiter la précense d'image inutilisable (car rempli de nuage )dans le jeu de données.
         2. De Janvier à Avril les arbres à Café sont fortement arrosé, dans le but de fleurir en Février. Durant cette période, les arbres a café sont donc plus facilement visible depuis le ciel à l'aide des flurs blanches qui les composent. 
     * A partir de ces 2 infos, les images de l'année 2021 ont été récupéré sur cette période, découpé et prétraité. 
     * Les 2 modèles de transfer learning 13 bands ont été entrainé avec ces nouvelles images. 
-* **Entrainement des modèles de transfer learning en modifiant les paramètres de normalisation - 4h00**
+* **Entrainement des modèles de transfer learning en modifiant les paramètres de normalisation - 3h00**
     * Jusqu'a présent dans le but de reproduir fidélement le preprocessing effectué par E.Ransome, une normalisation de type z-norm avec la moyenne et l'écart type de toute les images d'Eurosat a été utilisé. En appliquant cette normalisation sur nos images on constate que les pixels ne sont pas centrés sur la valeur 0 (ce qui est le but d'une normalisation z-norm). Ceci provient surement du fait que les images Eurosat capturé sur des paysages européen de présente pas les mêmes caractéristiques que les images du sol vietnamien.
     * L'idée est alors de calculer la moyenne et l'écart type sur les images du Vietnam et d'utiliser ces paramètres pour effectuer la normalisation z-norm sur ces parametres et de réentrainer les modèles.
     * Etape :
@@ -239,13 +239,26 @@
         3. Entrainement des nouveaux modèles
         4. Comparaison et analyse des résultats
 
+## 12.04.2021 - 18.04.2021
+* **Fin d'entrainement des modèles avec les nouveaux paramètres du vietnam et analyse des résultats**
+* **Rédaction du rapport - 4h00**
+    * Normalisation
+    * DenseNet Transferlearning
+    * Variation de bande
+    * Culture vs non culture
+    * Ajout de schéma pour le préprocessing, la variation de bande et l'architecture des différents modèles
 
-# Idées
-* Autoencoder
+# Definitions
+* **Transfer learning :** Consiste à prendre des features apprises sur une problème et les utiliser sur un nouveau problème similaire.
+    1. Prendre tous les layers du modèle entrainé
+    2. Freezer les couches
+    3. Ajouter des nouvelles couches trainable en haut du modèle
+    4. Entrainer les nouvelles couches sur notre dataset
+* **Fine tuning :** Etape optionnel, qui consiste a unfreezer toutes les couches du modèle préccedent et les réentrainéer sur les nouvelles données avec un learning très petit. 
+* **Feature extractions :** Consiste à prendre un modèle préentrainé, charger les poids, executer les nouvelles données sur le modèle et enregistrer la sortie. On utilise ensuite cette sortie pour entrainer un modèle plus petit.
 
 # Taches
 * Cross val
-* Preprcess avec mean et std jeu de données
 
 # Informations
 * Vietnam saison :
