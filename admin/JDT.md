@@ -272,3 +272,10 @@
 
 # Sources
 [1] - bandsVariability, March 15, 2021, S.Walther
+
+2018 mai - 2018 octobre
+2018 novembre - 2019 avril
+2019 mai - 2019 octobre
+2019 novembre - 2020 avril
+2020 mai - 2020 octobre
+2020 novembre - 2021 avril
