@@ -9,8 +9,8 @@ from IAdeforestation.preprocessing import normalize
 eurosat_params = {'mean':[1353.036, 1116.468, 1041.475, 945.344, 1198.498, 2004.878, 2376.699, 2303.738, 732.957, 12.092, 1818.820, 1116.271, 2602.579],
                   'std':[65.479, 154.008, 187.997, 278.508, 228.122, 356.598, 456.035, 531.570, 98.947, 1.188, 378.993, 303.851, 503.181]}
 
-vietnam_params = {'mean':[1505.3912245,1262.278884,1188.270451,1038.9751485,1298.016616,2304.750201,2820.626611,2676.388643,568.939934,18.29427,2073.8799665,1170.6030005,3105.341244],
-                  'std':[981.0595285790714,1055.6179992139178,1044.5322001484756,1181.0540245679736,1098.2968767668983,1104.3583924379755,1235.1890691868484,1169.186500135096,348.91136284684853,25.334801244398527,1134.6082535123755,918.6739574276703,1300.942717213371]}
+vietnam_params = {'mean':[1279.534254, 1016.734146, 925.27579, 793.929164, 1073.835362, 1909.174038, 2299.416608, 2270.341238, 739.972412, 14.35029, 1872.530084, 1055.580112, 2581.31964],
+                  'std':[217.06847657849937, 236.49447129038893, 254.3062726895201, 383.2039520109347, 368.1552150776269, 508.3797488499248, 648.9503962237852, 672.6241209212196, 250.63210405653427, 9.4263874644246, 805.0923719290897, 632.9663115986274, 746.86130213707]}
 
 def generator(paths, classes, eurosat_mean, eurosat_std, batch_size=32, is_data_augmentation=True):
     
@@ -115,7 +115,7 @@ def keras_layer_generator(paths, classes, eurosat_mean, eurosat_std, keras_layer
         X_pre = keras_layer(X).numpy()
         yield (X_pre,Y)
 
-def change_model(model, new_input_shape,custom_objects=None):
+def change_model(model, new_input_shape,custom_objects=None,verbose=False):
     # replace input shape of first layer
     
     config = model.layers[0].get_config()
@@ -129,7 +129,8 @@ def change_model(model, new_input_shape,custom_objects=None):
     for layer in new_model._layers:
         try:
             layer.set_weights(model.get_layer(name=layer.name).get_weights())
-            print("Loaded layer {}".format(layer.name))
+            if verbose :
+                print("Loaded layer {}".format(layer.name))
         except:
             print("Could not transfer weights for layer {}".format(layer.name))
 
