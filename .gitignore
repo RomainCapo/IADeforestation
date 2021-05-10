@@ -8,6 +8,7 @@ TransferLearning/
 logs/
 spring_images/
 fall_images/
+sping_images_32/
 
 .ipynb_checkpoints
 */.ipynb_checkpoints/*
