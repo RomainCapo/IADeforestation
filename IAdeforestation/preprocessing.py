@@ -130,15 +130,19 @@ def get_labels(begin, end, points, transformer):
     Returns:
         set: Set of labels contained in the given point.
     """
-    labels = set()
+    labels = {}
     long1, lat1 = convert_to_format(begin, transformer)
     long2, lat2 = convert_to_format(end, transformer)
     for point in points:
         if long1 <= point[0][0] <= long2 and lat2 <= point[0][1] <= lat1:
-            labels.add(point[1])
+            if point[1] in labels:
+                labels[point[1]].append(point[0])
+            else :
+                labels[point[1]] = []
+                labels[point[1]].append(point[0])
     return labels
 
-def split_export_img(original_img, raster_template, points, img_prefix='img', crop_size=64, split_size=171, shapefile_epsg=4326, export_folder='images'):
+def split_export_img(original_img, raster_template, points, img_prefix='img', crop_size=64, split_size=171, shapefile_epsg=4326, export_folder='images',geo_paths=None):
     """Splits the large image into split_size small image of size crop_size
 
     Args:
@@ -170,11 +174,19 @@ def split_export_img(original_img, raster_template, points, img_prefix='img', cr
             end = orignal_transform * ((j+1)*crop_size, (i+1)*crop_size)
 
             new_transform = affine.Affine(10.0, 0.0, begin[0], 0.0, -10.0, begin[1])
-                        
-            labels = get_labels(begin, end, points, transformer)
-            export_img(img, img_prefix + '_' + str(i) + '_' + str(j), labels, orignal_dtypes, orignal_crs, new_transform, export_folder=export_folder) 
             
-def export_img(img, name, labels, dtype, crs, transform, export_folder='images'):
+            labels = get_labels(begin, end, points, transformer)
+            
+            export_img(img=img, 
+                       name=img_prefix + '_' + str(i) + '_' + str(j), 
+                       labels=labels, 
+                       dtype=orignal_dtypes, 
+                       crs=orignal_crs, 
+                       transform=new_transform, 
+                       export_folder=export_folder,
+                      geo_paths=geo_paths)
+            
+def export_img(img, name, labels, dtype, crs, transform, export_folder='images', geo_paths=None):
     """Save the raster image as tiff file on the disk
 
     Args:
@@ -187,13 +199,15 @@ def export_img(img, name, labels, dtype, crs, transform, export_folder='images')
         export_folder (str, optional): Export folder. Defaults to 'images'.
     """
     target_label = 0
-    if len(labels) == 1:
-        target_label = list(labels)[0]
-    elif len(labels) > 1:
+    nb_labels = len(labels.keys())
+    if nb_labels == 1:
+        target_label = next(iter(labels))
+    elif nb_labels > 1:
         target_label = -1
     
     if target_label >= 1 and target_label <= 32: 
-        with rasterio.open(os.path.join(export_folder, str(target_label), name+'.tiff'), 'w', driver='Gtiff',
+        path = os.path.join(export_folder, str(target_label), name+'.tiff')
+        with rasterio.open(path, 'w', driver='Gtiff',
                                                   width=img.shape[1],
                                                   height=img.shape[2],
                                                   count=img.shape[0],
@@ -201,3 +215,6 @@ def export_img(img, name, labels, dtype, crs, transform, export_folder='images')
                                                    crs=crs,
                                                    transform=transform) as dst :
             dst.write(img)
+        if geo_paths is not None:
+            label_coord = labels[target_label][0]
+            geo_paths.append([path, target_label, Point(label_coord[0], label_coord[1])])

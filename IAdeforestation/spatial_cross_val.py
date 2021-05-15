@@ -110,11 +110,11 @@ def display_cross_val_map_class(data_train, data_val, maps, title, xlim=[106,110
     maps.plot(ax=axes[0],facecolor='Grey', edgecolor='k',alpha=0.5,linewidth=0.3)
     maps.plot(ax=axes[1],facecolor='Grey', edgecolor='k',alpha=0.5,linewidth=0.3)
 
-    data_train[data_train['label'] == 2].plot(ax=axes[0], markersize=1,categorical=True, legend=True, c="tab:green")
-    data_val[data_val['label'] == 2].plot(ax=axes[0], markersize=1,categorical=True, legend=True, c="tab:orange")
+    data_train[data_train['label'] == 0].plot(ax=axes[0], markersize=1,categorical=True, legend=True, c="tab:green")
+    data_val[data_val['label'] == 0].plot(ax=axes[0], markersize=1,categorical=True, legend=True, c="tab:orange")
     
-    data_train[data_train['label'] != 2].plot(ax=axes[1], markersize=1,categorical=True, legend=True, c="tab:pink")
-    data_val[data_val['label'] != 2].plot(ax=axes[1], markersize=1,categorical=True, legend=True, c="tab:blue")
+    data_train[data_train['label'] == 1].plot(ax=axes[1], markersize=1,categorical=True, legend=True, c="tab:pink")
+    data_val[data_val['label'] == 1].plot(ax=axes[1], markersize=1,categorical=True, legend=True, c="tab:blue")
 
     axes[0].set_xlim(xlim)
     axes[0].set_ylim(ylim)
@@ -137,4 +137,3 @@ def display_cross_val_map_class(data_train, data_val, maps, title, xlim=[106,110
     legend.legendHandles[1]._sizes = [30]
 
     fig.suptitle(title)
-    fig.tight_layout()
