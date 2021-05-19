@@ -104,7 +104,7 @@ def display_cross_val_map(data_train, data_val, maps, title, xlim=[106,110], yli
     fig.suptitle(title)
     fig.tight_layout()
     
-def display_cross_val_map_class(data_train, data_val, maps, title, xlim=[106,110], ylim=[10,16], figsize=(12,6)):
+def display_cross_val_map_class(data_train, data_val, maps, title, legend1=['Train coffee', 'Val coffee'], legend2=['Train other', 'Val other'], xlim=[106,110], ylim=[10,16], figsize=(12,6)):
     fig, axes = plt.subplots(1,2,figsize=figsize)
 
     maps.plot(ax=axes[0],facecolor='Grey', edgecolor='k',alpha=0.5,linewidth=0.3)
