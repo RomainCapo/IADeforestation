@@ -167,3 +167,28 @@ def f1_score_keras(y_true, y_pred):
     precision = precision(y_true, y_pred)
     recall = recall(y_true, y_pred)
     return 2*((precision*recall)/(precision+recall+K.epsilon()))
+
+def compute_score(geo_val, model):
+    
+    test_generator = generator(geo_val['path'].to_numpy(), 
+                        geo_val['label'].to_numpy(), 
+                        eurosat_params['mean'], 
+                        eurosat_params['std'], 
+                        batch_size=len(geo_val))
+    
+    model.evaluate(test_generator,steps=1)
+    Y_true = []
+    Y_pred = []
+    for i in range (0,1):
+        X, Y = next(test_generator)
+        Y_pred.extend(np.where(model.predict(X) > 0.5, 1, 0))
+
+        Y_true.extend(Y.tolist())
+
+    Y_true = np.asarray(Y_true)
+    Y_pred = np.asarray(Y_pred)
+    cm = confusion_matrix(Y_true, Y_pred)
+    print(cm)
+    
+    print(classification_report(Y_true, Y_pred))
+    print(f"F1-Score : {f1_score(Y_true, Y_pred)}")

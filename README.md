@@ -59,3 +59,4 @@
         * Contient les notebooks utilisé dans le travail de E.Ransome
 * **map.geojson** : Fichier GEOJSON contenant un MultiPolygon qui englobe 5 images Sentinel2 contenant tous les labels fournit par le CIAT.
 * **download_sentinel.py :** Script permettant de telécharger les images Sentinel2 brut à partir du fichier map.geojson
+* **requierements.txt :** Liste des packages Python install� avec la version correspondante.

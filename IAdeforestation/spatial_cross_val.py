@@ -99,22 +99,22 @@ def display_cross_val_map(data_train, data_val, maps, title, xlim=[106,110], yli
 
     legend = ax.legend(["Train", "Test"])
     legend.legendHandles[0]._sizes = [30]
-    legend.legendHandles[1]._sizes = [30]
+    legend.legendHandles[1]._sizes = [30] 
 
     fig.suptitle(title)
     fig.tight_layout()
     
-def display_cross_val_map_class(data_train, data_val, maps, title, legend1=['Train coffee', 'Val coffee'], legend2=['Train other', 'Val other'], xlim=[106,110], ylim=[10,16], figsize=(12,6)):
+def display_cross_val_map_class(data_train, data_val, maps, title, column_name='label', legend1=['Train coffee', 'Val coffee'], legend2=['Train other', 'Val other'], xlim=[106,110], ylim=[10,16], figsize=(12,6)):
     fig, axes = plt.subplots(1,2,figsize=figsize)
 
     maps.plot(ax=axes[0],facecolor='Grey', edgecolor='k',alpha=0.5,linewidth=0.3)
     maps.plot(ax=axes[1],facecolor='Grey', edgecolor='k',alpha=0.5,linewidth=0.3)
 
-    data_train[data_train['label'] == 0].plot(ax=axes[0], markersize=1,categorical=True, legend=True, c="tab:green")
-    data_val[data_val['label'] == 0].plot(ax=axes[0], markersize=1,categorical=True, legend=True, c="tab:orange")
+    data_train[data_train[column_name] == 0].plot(ax=axes[0], markersize=1,categorical=True, legend=True, c="tab:green")
+    data_val[data_val[column_name] == 0].plot(ax=axes[0], markersize=1,categorical=True, legend=True, c="tab:orange")
     
-    data_train[data_train['label'] == 1].plot(ax=axes[1], markersize=1,categorical=True, legend=True, c="tab:pink")
-    data_val[data_val['label'] == 1].plot(ax=axes[1], markersize=1,categorical=True, legend=True, c="tab:blue")
+    data_train[data_train[column_name] == 1].plot(ax=axes[1], markersize=1,categorical=True, legend=True, c="tab:pink")
+    data_val[data_val[column_name] == 1].plot(ax=axes[1], markersize=1,categorical=True, legend=True, c="tab:blue")
 
     axes[0].set_xlim(xlim)
     axes[0].set_ylim(ylim)
@@ -128,11 +128,11 @@ def display_cross_val_map_class(data_train, data_val, maps, title, legend1=['Tra
     axes[1].set_xlabel("Latitude")
     axes[1].set_ylabel("Longitude")
 
-    legend = axes[0].legend(["Train coffee", "Val coffee"])
+    legend = axes[0].legend(legend1)
     legend.legendHandles[0]._sizes = [30]
     legend.legendHandles[1]._sizes = [30]
     
-    legend = axes[1].legend(["Train other", "Val other"])
+    legend = axes[1].legend(legend2)
     legend.legendHandles[0]._sizes = [30]
     legend.legendHandles[1]._sizes = [30]
 
