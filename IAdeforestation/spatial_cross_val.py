@@ -6,84 +6,18 @@ import matplotlib.pyplot as plt
 from shapely import wkt
 from shapely.geometry.point import Point
 
-def compute_mean_point(df):
-    coord_x = []
-    coord_y = []
-    
-    for p in df['geometry'].to_numpy():
-        coord_x.append(p.x)
-        coord_y.append(p.y)
-        
-    return (np.mean(coord_x), np.mean(coord_y))
-
-def find_nearest_points(mean_point, df_points, nb_to_draw):
-    dict_points = {}
-    for p in df_points.iterrows():
-        current_point = p[1]['geometry']
-        dict_points[p[0]] = np.sqrt((mean_point[0] - current_point.x) ** 2 + (mean_point[1] - current_point.y) ** 2)
-        
-    sorted_dict = dict(sorted(dict_points.items(), key=lambda item: item[1]))
-    return list(sorted_dict)[0:nb_to_draw]
-
-def stratified_df(geo_train, geo_val, nb_labels, nb_fold=5):
-    
-    prop0 = nb_labels[0]/nb_fold
-    prop1 = nb_labels[1]/nb_fold
-    
-    nb_train0 = len(geo_train[geo_train['label'] ==0])
-    nb_val0 = len(geo_val[geo_val['label'] ==0])
-
-    
-    mean_train = compute_mean_point(geo_train)
-    mean_val = compute_mean_point(geo_val)
-    
-    if np.abs(nb_val0 - prop0) < 5 :
-        pass
-    else:
-        if nb_val0 < prop0:
-            nb_to_draw = int(prop0 - nb_val0)
-            
-            index_to_switch = find_nearest_points(mean_val, geo_train[geo_train['label'] == 0], nb_to_draw)
-            rows = geo_train.loc[index_to_switch]
-            geo_train = geo_train.drop(index_to_switch, inplace=False, axis='index')
-            
-            geo_val = geo_val.append(rows, ignore_index=True)
-        else :
-
-            nb_to_draw = int(nb_val0 - prop0)
-            
-            index_to_switch = find_nearest_points(mean_train, geo_val[geo_val['label'] == 0], nb_to_draw)
-            rows = geo_val.loc[index_to_switch]
-            geo_val = geo_val.drop(index_to_switch, inplace=False, axis='index')
-            
-            geo_train = geo_train.append(rows, ignore_index=True)
-            
-    nb_train1 = len(geo_train[geo_train['label'] ==1])
-    nb_val1 = len(geo_val[geo_val['label'] ==1])
-
-    if np.abs(nb_val1 - prop1) < 5 :
-        pass
-    else:
-        if nb_val1 < prop1:
-            nb_to_draw = int(prop1 - nb_val1)
-            
-            index_to_switch = find_nearest_points(mean_val, geo_train[geo_train['label'] ==1], nb_to_draw)
-            rows = geo_train.loc[index_to_switch]
-            geo_train = geo_train.drop(index_to_switch, inplace=False, axis='index')
-            
-            geo_val = geo_val.append(rows, ignore_index=True)
-        else :
-            nb_to_draw = int(nb_val1 - prop1)
-            
-            index_to_switch = find_nearest_points(mean_train, geo_val[geo_val['label'] == 1], nb_to_draw)
-            rows = geo_val.loc[index_to_switch]
-            geo_val = geo_val.drop(index_to_switch, inplace=False, axis='index')
-            
-            geo_train = geo_train.append(rows, ignore_index=True)
-                             
-    return (geo_train, geo_val)
-
 def display_cross_val_map(data_train, data_val, maps, title, xlim=[106,110], ylim=[10,16], figsize=(6,6)):
+    """Display of the map the train and valididation points.
+
+    Args:
+        data_train (geopandas.GeoDataFrame): GeoDataFrame with one column contains coordinates of points.
+        data_val (geopandas.GeoDataFrame): GeoDataFrame with one column contains coordinates of points.
+        maps (geopandas.GeoDataFrame): GeoDataFrame that contain a map. 
+        title (string): Title of the map plot
+        xlim (list, optional): Latitude range to display. Defaults to [106,110].
+        ylim (list, optional): Longitude range to display. Defaults to [10,16].
+        figsize (tuple, optional): Size of the plot. Defaults to (6,6).
+    """
     fig, ax = plt.subplots(figsize=figsize)
 
     maps.plot(ax=ax,facecolor='Grey', edgecolor='k',alpha=0.5,linewidth=0.3)
@@ -105,6 +39,20 @@ def display_cross_val_map(data_train, data_val, maps, title, xlim=[106,110], yli
     fig.tight_layout()
     
 def display_cross_val_map_class(data_train, data_val, maps, title, column_name='label', legend1=['Train coffee', 'Val coffee'], legend2=['Train other', 'Val other'], xlim=[106,110], ylim=[10,16], figsize=(12,6)):
+    """Display of the map the train and valididation points for each class (max 2). Use to display for the 10 folds methods.
+
+    Args:
+        data_train (geopandas.GeoDataFrame): GeoDataFrame with one column contains coordinates of points.
+        data_val (geopandas.GeoDataFrame): GeoDataFrame with one column contains coordinates of points.
+        maps (geopandas.GeoDataFrame): GeoDataFrame that contain a map. 
+        title (string): Title of the map plot
+        column_name (str, optional): Column which contains the label. Defaults to 'label'.
+        legend1 (list, optional): Legend for class 0 map. Defaults to ['Train coffee', 'Val coffee'].
+        legend2 (list, optional): Legend for class 1 map. Defaults to ['Train other', 'Val other'].
+        xlim (list, optional): Latitude range to display. Defaults to [106,110].
+        ylim (list, optional): Longitude range to display. Defaults to [10,16].
+        figsize (tuple, optional): Size of the plot. Defaults to (12,6).
+    """
     fig, axes = plt.subplots(1,2,figsize=figsize)
 
     maps.plot(ax=axes[0],facecolor='Grey', edgecolor='k',alpha=0.5,linewidth=0.3)

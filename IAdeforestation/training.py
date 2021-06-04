@@ -7,14 +7,27 @@ from tensorflow.keras.models import model_from_json
 
 from IAdeforestation.preprocessing import normalize
 
+
 eurosat_params = {'mean':[1353.036, 1116.468, 1041.475, 945.344, 1198.498, 2004.878, 2376.699, 2303.738, 732.957, 12.092, 1818.820, 1116.271, 2602.579],
-                  'std':[65.479, 154.008, 187.997, 278.508, 228.122, 356.598, 456.035, 531.570, 98.947, 1.188, 378.993, 303.851, 503.181]}
+                  'std':[65.479, 154.008, 187.997, 278.508, 228.122, 356.598, 456.035, 531.570, 98.947, 1.188, 378.993, 303.851, 503.181]} # Contains the mean and the std for each 13 bands. Computed on all Eurosat images.
 
 vietnam_params = {'mean':[1279.534254, 1016.734146, 925.27579, 793.929164, 1073.835362, 1909.174038, 2299.416608, 2270.341238, 739.972412, 14.35029, 1872.530084, 1055.580112, 2581.31964],
-                  'std':[217.06847657849937, 236.49447129038893, 254.3062726895201, 383.2039520109347, 368.1552150776269, 508.3797488499248, 648.9503962237852, 672.6241209212196, 250.63210405653427, 9.4263874644246, 805.0923719290897, 632.9663115986274, 746.86130213707]}
+                  'std':[217.06847657849937, 236.49447129038893, 254.3062726895201, 383.2039520109347, 368.1552150776269, 508.3797488499248, 648.9503962237852, 672.6241209212196, 250.63210405653427, 9.4263874644246, 805.0923719290897, 632.9663115986274, 746.86130213707]} # Contains the mean and the std for each 13 bands. Computed on Vietnam images.
 
 def generator(paths, classes, eurosat_mean, eurosat_std, batch_size=32, is_data_augmentation=True):
-    
+    """Image generator for 13 bands images.
+
+    Args:
+        paths (list): List of images paths.
+        classes (list): List of images labels.
+        eurosat_mean (list): List of mean for each bands.
+        eurosat_std (list): List of std for each bands.
+        batch_size (int, optional): Size of generator batch. Defaults to 32.
+        is_data_augmentation (bool, optional): Perform data augmentation on images (Rotation [90°, 180°, 270°], vertical bit flip, horizontal bit flip). Defaults to True.
+
+    Yields:
+        Generator: Tuple (images, labels)
+    """
     while True : 
         random_indexs = random.sample(range(0,len(paths)), batch_size)
         batch_paths = paths[random_indexs]
@@ -48,7 +61,20 @@ def generator(paths, classes, eurosat_mean, eurosat_std, batch_size=32, is_data_
         yield (X,Y)
 
 def generator_bands(paths, classes, eurosat_mean, eurosat_std, bands, batch_size=32, is_data_augmentation=True):
-    
+    """Image generator with custom number of bands.
+
+    Args:
+ paths (list): List of images paths.
+        classes (list): List of images labels.
+        eurosat_mean (list): List of mean for each bands.
+        eurosat_std (list): List of std for each bands.
+        bands (list): List of bands to use.
+        batch_size (int, optional): Size of generator batch. Defaults to 32.
+        is_data_augmentation (bool, optional): Perform data augmentation on images (Rotation [90°, 180°, 270°], vertical bit flip, horizontal bit flip). Defaults to True.
+
+    Yields:
+        Generator: Tuple (images, labels)
+    """
     while True : 
         random_indexs = random.sample(range(0,len(paths)), batch_size)
         batch_paths = paths[random_indexs]
@@ -82,7 +108,20 @@ def generator_bands(paths, classes, eurosat_mean, eurosat_std, bands, batch_size
         yield (X,Y)
 
 def keras_layer_generator(paths, classes, eurosat_mean, eurosat_std, keras_layer, batch_size=32, is_data_augmentation=True):
-    
+    """Image generator for 13 bands images with a keras layer. The keras layer is applied to images before yield.
+
+    Args:
+        paths (list): List of images paths.
+        classes (list): List of images labels.
+        eurosat_mean (list): List of mean for each bands.
+        eurosat_std (list): List of std for each bands.
+        keras_layer (tensorflow_hub.keras_layer.KerasLayer): Keras layer to use as feature extraction module.
+        batch_size (int, optional): Size of generator batch. Defaults to 32.
+        is_data_augmentation (bool, optional): Perform data augmentation on images (Rotation [90°, 180°, 270°], vertical bit flip, horizontal bit flip). Defaults to True.
+
+    Yields:
+        Generator: Tuple (images, labels)
+    """
     while True : 
         random_indexs = random.sample(range(0,len(paths)), batch_size)
         batch_paths = paths[random_indexs]
@@ -117,7 +156,17 @@ def keras_layer_generator(paths, classes, eurosat_mean, eurosat_std, keras_layer
         yield (X_pre,Y)
 
 def change_model(model, new_input_shape,custom_objects=None,verbose=False):
-    # replace input shape of first layer
+    """Replace input shape of first layer
+
+    Args:
+        model (keras.Model): Model to replace the first layer input shape.
+        new_input_shape (tuple): New input shape.
+        custom_objects (dict, optional): Dict of custom objects to load with model. Defaults to None.
+        verbose (bool, optional): Display log informations. Defaults to False.
+
+    Returns:
+        keras.Model: Model with new input shape.
+    """
     
     config = model.layers[0].get_config()
     config['batch_input_shape']=new_input_shape
@@ -139,6 +188,12 @@ def change_model(model, new_input_shape,custom_objects=None,verbose=False):
 
 
 def f1_score_keras(y_true, y_pred):
+    """Compute the F1-Score during model training.
+
+    Args:
+        y_true (np.ndarray): True labels.
+        y_pred (np.ndarray): Predicted labels.
+    """
     def recall(y_true, y_pred):
         """Recall metric.
 
@@ -167,28 +222,3 @@ def f1_score_keras(y_true, y_pred):
     precision = precision(y_true, y_pred)
     recall = recall(y_true, y_pred)
     return 2*((precision*recall)/(precision+recall+K.epsilon()))
-
-def compute_score(geo_val, model):
-    
-    test_generator = generator(geo_val['path'].to_numpy(), 
-                        geo_val['label'].to_numpy(), 
-                        eurosat_params['mean'], 
-                        eurosat_params['std'], 
-                        batch_size=len(geo_val))
-    
-    model.evaluate(test_generator,steps=1)
-    Y_true = []
-    Y_pred = []
-    for i in range (0,1):
-        X, Y = next(test_generator)
-        Y_pred.extend(np.where(model.predict(X) > 0.5, 1, 0))
-
-        Y_true.extend(Y.tolist())
-
-    Y_true = np.asarray(Y_true)
-    Y_pred = np.asarray(Y_pred)
-    cm = confusion_matrix(Y_true, Y_pred)
-    print(cm)
-    
-    print(classification_report(Y_true, Y_pred))
-    print(f"F1-Score : {f1_score(Y_true, Y_pred)}")
